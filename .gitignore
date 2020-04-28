@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/tour
+tour.so
+tour.dylib
+tour.dll
+tour.a
+tour.lib
+tour-test-*
+*.exe
+*.o
+*.obj
+*.lst
