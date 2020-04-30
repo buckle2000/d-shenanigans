@@ -1,6 +1,140 @@
 module tests;
 import std.stdio;
 
+// interface Control
+// {
+// }
+
+// class Window : Control
+// {
+//     private Control child;
+//     this(Control _child)
+//     {
+//         writeln("new Window");
+//         child = _child;
+//     }
+// }
+
+// class VBox : Control
+// {
+//     private Control[] children;
+//     this(Control[] _children)
+//     {
+//         writeln("new VBox");
+//         children = _children;
+//     }
+// }
+
+// void dsltest()
+// {
+//     auto window = new Window(new VBox([]));
+// }
+
+
+struct Nothin {}
+
+class Nil {}
+class One {}
+
+void casttest() {
+    // auto a = cast(Nothin) 1;
+    if (auto a = cast(Nil) new One()) {
+        writeln(a);
+    } else {
+        writeln("Cast failed");
+    }
+    int x;
+    auto x = cast(const) x;
+}
+
+void ducktypingtest()
+{
+    void useRange(InputRange!int range)
+    {
+        // Function body.
+    }
+
+    // Create a range type.
+    auto squares = map!"a * a"(iota(10));
+
+    // Wrap it in an interface.
+    auto squaresWrapped = inputRangeObject(squares);
+
+    // Use it.
+    useRange(squaresWrapped);
+}
+
+interface Animal
+{
+    void voice();
+}
+
+class Bee : Animal
+{
+    void voice()
+    {
+        writeln("Bzzzz");
+    }
+}
+
+struct Clock
+{
+    int time;
+    void voice()
+    {
+        writefln("The time is %02d:00", time);
+    }
+}
+
+struct Rock
+{
+}
+
+import std.traits : ReturnType;
+
+Animal toAnimal(R)(R r)
+{
+    class AnimalR : Animal
+    {
+        R inner;
+        this(ref R _inner)
+        {
+            inner = _inner;
+        }
+
+        static if (is(ReturnType!((R r) => r.voice) == void))
+        {
+            void voice()
+            {
+                inner.voice;
+            }
+        }
+        else
+        {
+            void voice()
+            {
+                writefln("I'm a %s. I can't speak.", typeid(R).name);
+            }
+        }
+    }
+
+    return new AnimalR(r);
+}
+
+void ducktypingtest2()
+{
+    Animal[] animals;
+    animals ~= new Bee();
+    animals ~= Clock(7).toAnimal;
+    animals ~= Rock().toAnimal;
+    writeln(animals);
+    foreach (animal; animals)
+    {
+        writef("%s ", typeid(animal));
+        animal.voice();
+    }
+}
+
 import std.concurrency;
 import core.thread;
 import core.atomic;
